@@ -33,6 +33,7 @@ public class Product {
 
 	private int stock;
 
+	@Column(length = 1000)
 	private String image;
 
 	private int discount;
@@ -40,5 +41,14 @@ public class Product {
 	private Double discountPrice;
 	
 	private Boolean isActive;
+
+	public boolean isImageUrl() {
+		return image != null && (image.startsWith("http://") || image.startsWith("https://"));
+	}
+
+	// Add this method to get the proper image source
+	public String getImageSource() {
+		return isImageUrl() ? image : "/img/product_img/" + image;
+	}
 	
 }

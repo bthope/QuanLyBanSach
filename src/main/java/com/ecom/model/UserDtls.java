@@ -52,4 +52,5 @@ public class UserDtls {
 	
 	private String resetToken;
 
+
 }
