@@ -62,7 +62,7 @@
 							</th:block>
 
 
-							<br> Category: [[${product.category}]]<br> Policy : 7
+							<br> Category: [[${product.category.name}]]<br> Policy : 7
 							Days Replacement & Return
 						</p>
 						<p class="fs-5 fw-bold">
@@ -93,11 +93,16 @@
 								<a href="/signin" class="btn btn-danger col-md-12">Add To
 									Cart</a>
 							</th:block>
-
+<!--							UPDATE BY BaoThong-->
 							<th:block th:unless="${user==null}">
+								<th:block th:if="${user.role=='ROLE_USER'}">
 								<a
 									th:href="@{'/user/addCart?pid='+${product.id}+'&uid='+${user.id}}"
-									class="btn btn-danger col-md-12">Add To Cart</a>
+									class="btn btn-danger col-md-12">Add To Cart</a></th:block>
+								<th:block th:if="${user.role=='ROLE_ADMIN'}">
+								<a
+										th:href="@{'/admin/addCart?pid='+${product.id}+'&uid='+${user.id}}"
+										class="btn btn-danger col-md-12">Add To Cart</a></th:block>
 							</th:block>
 
 						</th:block>
