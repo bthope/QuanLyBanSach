@@ -74,7 +74,7 @@ public class UserController {
 		Cart saveCart = cartService.saveCart(pid, uid);
 
 		if (ObjectUtils.isEmpty(saveCart)) {
-			session.setAttribute("errorMsg", "Product add to cart failed");
+			session.setAttribute("errorMsg", "This product has reached the maximum in the cart");
 		} else {
 			session.setAttribute("succMsg", "Product added to cart");
 		}

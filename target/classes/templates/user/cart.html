@@ -1,85 +1,92 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-	th:replace="~{base::layout(~{::section})}">
+      th:replace="~{base::layout(~{::section})}">
 <head>
-<meta charset="ISO-8859-1">
-<title>Insert title here</title>
+    <meta charset="ISO-8859-1">
+    <title>Insert title here</title>
 </head>
 <body>
-	<section>
-		<div class="container-fluid mt-5 p-5">
+<section>
+    <div class="container-fluid mt-5 p-5">
 
-			<div class="card card-sh">
-				<div class="card-header text-center">
-					<p class="fs-4">Cart Page</p>
-					<th:block th:if="${session.succMsg}">
-						<p class="text-success fw-bold">[[${session.succMsg}]]</p>
-						<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
-					</th:block>
+        <div class="card card-sh">
+            <div class="card-header text-center">
+                <p class="fs-4">Cart Page</p>
+                <th:block th:if="${session.succMsg}">
+                    <p class="text-success fw-bold">[[${session.succMsg}]]</p>
+                    <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                </th:block>
 
-					<th:block th:if="${session.errorMsg}">
-						<p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
-						<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
-					</th:block>
-				</div>
-				<div class="card-body">
-					<table class="table">
-						<thead>
-							<tr>
-								<th scope="col">Sl No</th>
-								<th scope="col">Image</th>
-								<th scope="col">Product Name</th>
-								<th scope="col">Price</th>
-								<th scope="col" class="text-center">Quantity</th>
-								<th scope="col">Total Price</th>
-								<th scope="col" class="text-center">Delete</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr th:each="cart,c:${carts}">
-								<th scope="row">[[${c.count}]]</th>
-								<td>
-									<!-- Handle both URL and local images -->
-									<img th:if="${cart.product.image != null}"
-										 th:src="${cart.product.isImageUrl()} ? ${cart.product.image} : @{'/img/product_img/' + cart.product.image}"
-										 th:alt="${cart.product.title}"
-										 width="70px"
-										 height="70px">
+                <th:block th:if="${session.errorMsg}">
+                    <p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
+                    <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                </th:block>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Sl No</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Product Name</th>
+                        <th scope="col">Price</th>
+                        <th scope="col" class="text-center">Quantity</th>
+                        <th scope="col">Total Price</th>
+                        <th scope="col" class="text-center">Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="cart,c:${carts}">
+                        <th scope="row">[[${c.count}]]</th>
+                        <td>
+                            <!-- Handle both URL and local images -->
+                            <img th:if="${cart.product.image != null}"
+                                 th:src="${cart.product.isImageUrl()} ? ${cart.product.image} : @{'/img/product_img/' + cart.product.image}"
+                                 th:alt="${cart.product.title}"
+                                 width="70px"
+                                 height="70px">
 
-									<!-- Show default image if product.image is null -->
-									<img th:unless="${cart.product.image != null}"
-										 th:src="@{/img/product_img/default-product.jpg}"
-										 alt="Default product image"
-										 width="70px"
-										 height="70px">
-								</td>
-								<td>[[${cart.product.title}]]</td>
-								<td>[[${cart.product.discountPrice}]]</td>
-								<td class="text-center"><a
-									th:href="@{'/user/cartQuantityUpdate?sy=de&cid='+${cart.id}}">
-										<i class="fa-solid fa-minus"></i>
-								</a> [ [[${cart.quantity}]] ] <a
-									th:href="@{'/user/cartQuantityUpdate?sy=in&cid='+${cart.id}}">
-										<i class="fa-solid fa-plus"></i>
-								</a></td>
-								<td>[[${cart.totalPrice}]]</td>
-								<td class="text-center"><a th:href="@{'/user/cartDeleteProduct?cid='+${cart.id}}"><i class="fa-regular fa-trash-can"></i></a></td>
-							</tr>
-							<tr>
-								<td colspan="4"></td>
-								<td class="fw-bold">Total Price</td>
-								<td class="fw-bold">&#8377; [[${totalOrderPrice}]]</td>
-							</tr>
+                            <!-- Show default image if product.image is null -->
+                            <img th:unless="${cart.product.image != null}"
+                                 th:src="@{/img/product_img/default-product.jpg}"
+                                 alt="Default product image"
+                                 width="70px"
+                                 height="70px">
+                        </td>
+                        <td>[[${cart.product.title}]]</td>
+                        <td>[[${cart.product.discountPrice}]]</td>
+                        <td class="text-center"><a
+                                th:href="@{'/user/cartQuantityUpdate?sy=de&cid='+${cart.id}}">
+                            <i class="fa-solid fa-minus"></i>
+                        </a> [ [[${cart.quantity}]] ]
+                            <th:block th:if="${cart.product.stock > cart.quantity}">
+                                <a th:href="@{'/admin/cartQuantityUpdate?sy=in&cid='+${cart.id}}">
+                                    <i class="fa-solid fa-plus"></i>
+                                </a>
+                            </th:block>
+                            <th:block th:unless="${cart.product.stock > cart.quantity}">
+                                <i class="fa-solid fa-plus text-muted"></i>
+                            </th:block>
+                        </td>
+                        <td>[[${cart.totalPrice}]]</td>
+                        <td class="text-center"><a th:href="@{'/user/cartDeleteProduct?cid='+${cart.id}}"><i
+                                class="fa-regular fa-trash-can"></i></a></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"></td>
+                        <td class="fw-bold">Total Price</td>
+                        <td class="fw-bold">&#8377; [[${totalOrderPrice}]]</td>
+                    </tr>
 
-						</tbody>
-					</table>
-					<div class="text-center">
-						<a href="/user/orders" class="btn btn-warning"> Proceed Payment</a>
-					</div>
-				</div>
-			</div>
-		</div>
+                    </tbody>
+                </table>
+                <div class="text-center">
+                    <a href="/user/orders" class="btn btn-warning"> Proceed Payment</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-	</section>
+</section>
 </body>
 </html>
