@@ -208,5 +208,10 @@ public class UserController {
 
 		return "redirect:/user/profile";
 	}
+	@GetMapping("/cartDeleteProduct")
+	public String cartDeleteProduct(@RequestParam Integer cid) {
+		cartService.deleteCart(cid);
+		return "redirect:/user/cart";
+	}
 
 }

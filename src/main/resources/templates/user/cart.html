@@ -32,6 +32,7 @@
 								<th scope="col">Price</th>
 								<th scope="col" class="text-center">Quantity</th>
 								<th scope="col">Total Price</th>
+								<th scope="col" class="text-center">Delete</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -62,6 +63,7 @@
 										<i class="fa-solid fa-plus"></i>
 								</a></td>
 								<td>[[${cart.totalPrice}]]</td>
+								<td class="text-center"><a th:href="@{'/user/cartDeleteProduct?cid='+${cart.id}}"><i class="fa-regular fa-trash-can"></i></a></td>
 							</tr>
 							<tr>
 								<td colspan="4"></td>

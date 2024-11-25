@@ -608,4 +608,16 @@ public class AdminController {
         return "redirect:/admin/user-orders";
     }
 
+    @GetMapping("/cartQuantityUpdate")
+    public String updateCartQuantity(@RequestParam String sy, @RequestParam Integer cid) {
+        cartService.updateQuantity(sy, cid);
+        return "redirect:/admin/cart";
+    }
+
+    @GetMapping("/cartDeleteProduct")
+    public String cartDeleteProduct(@RequestParam Integer cid) {
+        cartService.deleteCart(cid);
+        return "redirect:/admin/cart";
+    }
+
 }

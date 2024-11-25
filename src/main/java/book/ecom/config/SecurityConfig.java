@@ -17,56 +17,56 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Autowired
-	private AuthenticationSuccessHandler authenticationSuccessHandler;
+    @Autowired
+    private AuthenticationSuccessHandler authenticationSuccessHandler;
 
-	@Autowired
-	@Lazy
-	private AuthFailureHandlerImpl authenticationFailureHandler;
+    @Autowired
+    @Lazy
+    private AuthFailureHandlerImpl authenticationFailureHandler;
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Bean
-	public UserDetailsService userDetailsService() {
-		return new UserDetailsServiceImpl();
-	}
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsServiceImpl();
+    }
 
-	@Bean
-	public DaoAuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-		authProvider.setUserDetailsService(userDetailsService());
-		authProvider.setPasswordEncoder(passwordEncoder());
-		return authProvider;
-	}
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http
-				.csrf(csrf -> csrf.disable())
-				.cors(cors -> cors.disable())
-				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/static/**", "/css/**", "/js/**", "/img/**", "/signin").permitAll()
-						.requestMatchers("/user/**").hasRole("USER")
-						.requestMatchers("/admin/**").hasRole("ADMIN")
-						.anyRequest().permitAll()
-				)
-				.formLogin(form -> form
-						.loginPage("/signin")
-						.loginProcessingUrl("/login")
-						.usernameParameter("username")
-						.passwordParameter("password")
-						.failureHandler(authenticationFailureHandler)
-						.successHandler(authenticationSuccessHandler)
-				)
-				.logout(logout -> logout
-						.logoutUrl("/logout")
-						.logoutSuccessUrl("/signin?logout")
-						.permitAll()
-				);
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/static/**", "/css/**", "/js/**", "/img/**", "/signin").permitAll()
+                        .requestMatchers("/user/**").hasRole("USER")
+                        .requestMatchers("/admin/**", "/user/**").hasRole("ADMIN")
+                        .anyRequest().permitAll()
+                )
+                .formLogin(form -> form
+                        .loginPage("/signin")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .failureHandler(authenticationFailureHandler)
+                        .successHandler(authenticationSuccessHandler)
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/signin?logout")
+                        .permitAll()
+                );
 
-		return http.build();
-	}
+        return http.build();
+    }
 }
