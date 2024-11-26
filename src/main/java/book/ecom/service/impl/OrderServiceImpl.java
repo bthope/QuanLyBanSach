@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import book.ecom.model.*;
+import book.ecom.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,10 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import book.ecom.model.Cart;
-import book.ecom.model.OrderAddress;
-import book.ecom.model.OrderRequest;
-import book.ecom.model.ProductOrder;
 import book.ecom.repository.CartRepository;
 import book.ecom.repository.ProductOrderRepository;
 import book.ecom.service.OrderService;
@@ -23,6 +21,8 @@ import book.ecom.util.OrderStatus;
 
 @Service
 public class OrderServiceImpl implements OrderService {
+    @Autowired
+    private ProductRepository productRepository;
 
     @Autowired
     private ProductOrderRepository orderRepository;
@@ -45,10 +45,12 @@ public class OrderServiceImpl implements OrderService {
             order.setOrderId(UUID.randomUUID().toString());
             order.setOrderDate(LocalDateTime.now());
 
-            order.setProduct(cart.getProduct());
-            order.setPrice(cart.getProduct().getDiscountPrice());
+            Product product = cart.getProduct();
+            order.setProduct(product);
+            order.setPrice(product.getDiscountPrice());
 
             order.setQuantity(cart.getQuantity());
+
             order.setUser(cart.getUser());
 
             order.setStatus(OrderStatus.IN_PROGRESS.getName());
@@ -65,6 +67,10 @@ public class OrderServiceImpl implements OrderService {
             address.setPincode(orderRequest.getPincode());
 
             order.setOrderAddress(address);
+
+            // Update stock
+            product.setStock(product.getStock() - cart.getQuantity());
+            productRepository.save(product);
 
             orders.add(order);
         }

@@ -1,6 +1,7 @@
 package book.ecom.controller;
 
 import java.security.Principal;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,12 +84,24 @@ public class UserController {
 
     @GetMapping("/cart")
     public String loadCartPage(Principal p, Model m) {
-
         UserDtls user = getLoggedInUserDetails(p);
         List<Cart> carts = cartService.getCartsByUser(user.getId());
+
+        Iterator<Cart> iterator = carts.iterator();
+        while (iterator.hasNext()) {
+            Cart cart = iterator.next();
+            if (cart.getProduct().getStock() == 0) {
+                cartService.deleteCart(cart.getId());
+                iterator.remove();
+            } else if (cart.getQuantity() > cart.getProduct().getStock()) {
+                cart.setQuantity(cart.getProduct().getStock());
+                cartService.updateCart(cart);
+            }
+        }
+
         m.addAttribute("carts", carts);
         if (carts.size() > 0) {
-            Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
+            Double totalOrderPrice = carts.stream().mapToDouble(Cart::getTotalOrderPrice).sum();
             m.addAttribute("totalOrderPrice", totalOrderPrice);
         }
         return "/user/cart";

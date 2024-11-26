@@ -111,4 +111,9 @@ public class CartServiceImpl implements CartService {
         cartRepository.deleteById(cid);
     }
 
+    @Override
+    public void updateCart(Cart cart) {
+        cartRepository.save(cart);
+    }
+
 }

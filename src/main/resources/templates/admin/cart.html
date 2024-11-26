@@ -81,7 +81,9 @@
                     </tbody>
                 </table>
                 <div class="text-center">
-                    <a href="/admin/ordersAdmin" class="btn btn-warning"> Proceed Payment</a>
+                    <th:block th:if="${carts.size() > 0}">
+                        <a href="/admin/ordersAdmin" class="btn btn-warning"> Proceed Payment</a>
+                    </th:block>
                 </div>
             </div>
         </div>
