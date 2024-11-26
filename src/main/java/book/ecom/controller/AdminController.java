@@ -115,12 +115,21 @@ public class AdminController {
                                @RequestParam("file") MultipartFile file,
                                HttpSession session) {
         try {
+            // Check for duplicate category name
+            List<Category> existingCategories = categoryService.getAllCategory();
+            for (Category existingCategory : existingCategories) {
+                if (existingCategory.getName().equalsIgnoreCase(category.getName())) {
+                    session.setAttribute("errorMsg", "Category name already exists");
+                    return "redirect:/admin/category";
+                }
+            }
+
             if (file != null && !file.isEmpty()) {
-                // Tạo tên file unique
+                // Create unique file name
                 String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
                 category.setImageName(fileName);
 
-                // Lưu file
+                // Save file
                 saveImageFile(file, fileName);
             } else {
                 category.setImageName("default-category.jpg");
