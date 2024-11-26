@@ -575,8 +575,11 @@ public class AdminController {
         m.addAttribute("userDtls", userDtls);
         if (carts.size() > 0) {
             Double orderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
-            Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice() + 250 + 100;
+            Double totalOrder = carts.get(carts.size() - 1).getTotalOrderPrice();
+            Double tax = totalOrder * 0.05;
+            Double totalOrderPrice = totalOrder + tax + 250;
             m.addAttribute("orderPrice", orderPrice);
+            m.addAttribute("tax", tax);
             m.addAttribute("totalOrderPrice", totalOrderPrice);
         }
         return "/admin/order";
