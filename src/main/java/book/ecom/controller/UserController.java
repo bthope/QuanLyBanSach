@@ -32,185 +32,188 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/user")
 public class UserController {
-	@Autowired
-	private UserService userService;
-	@Autowired
-	private CategoryService categoryService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private CategoryService categoryService;
 
-	@Autowired
-	private CartService cartService;
+    @Autowired
+    private CartService cartService;
 
-	@Autowired
-	private OrderService orderService;
+    @Autowired
+    private OrderService orderService;
 
-	@Autowired
-	private CommonUtil commonUtil;
+    @Autowired
+    private CommonUtil commonUtil;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
-	@GetMapping("/")
-	public String home() {
-		return "user/home";
-	}
+    @GetMapping("/")
+    public String home() {
+        return "user/home";
+    }
 
-	@ModelAttribute
-	public void getUserDetails(Principal p, Model m) {
-		if (p != null) {
-			String email = p.getName();
-			UserDtls userDtls = userService.getUserByEmail(email);
-			m.addAttribute("user", userDtls);
-			Integer countCart = cartService.getCountCart(userDtls.getId());
-			m.addAttribute("countCart", countCart);
-		}
+    @ModelAttribute
+    public void getUserDetails(Principal p, Model m) {
+        if (p != null) {
+            String email = p.getName();
+            UserDtls userDtls = userService.getUserByEmail(email);
+            m.addAttribute("user", userDtls);
+            Integer countCart = cartService.getCountCart(userDtls.getId());
+            m.addAttribute("countCart", countCart);
+        }
 
-		List<Category> allActiveCategory = categoryService.getAllActiveCategory();
-		m.addAttribute("categorys", allActiveCategory);
-	}
+        List<Category> allActiveCategory = categoryService.getAllActiveCategory();
+        m.addAttribute("categorys", allActiveCategory);
+    }
 
-	@GetMapping("/addCart")
-	public String addToCart(@RequestParam Integer pid, @RequestParam Integer uid, HttpSession session) {
-		Cart saveCart = cartService.saveCart(pid, uid);
+    @GetMapping("/addCart")
+    public String addToCart(@RequestParam Integer pid, @RequestParam Integer uid, HttpSession session) {
+        Cart saveCart = cartService.saveCart(pid, uid);
 
-		if (ObjectUtils.isEmpty(saveCart)) {
-			session.setAttribute("errorMsg", "This product has reached the maximum in the cart");
-		} else {
-			session.setAttribute("succMsg", "Product added to cart");
-		}
-		return "redirect:/product/" + pid;
-	}
+        if (ObjectUtils.isEmpty(saveCart)) {
+            session.setAttribute("errorMsg", "This product has reached the maximum in the cart");
+        } else {
+            session.setAttribute("succMsg", "Product added to cart");
+        }
+        return "redirect:/product/" + pid;
+    }
 
-	@GetMapping("/cart")
-	public String loadCartPage(Principal p, Model m) {
+    @GetMapping("/cart")
+    public String loadCartPage(Principal p, Model m) {
 
-		UserDtls user = getLoggedInUserDetails(p);
-		List<Cart> carts = cartService.getCartsByUser(user.getId());
-		m.addAttribute("carts", carts);
-		if (carts.size() > 0) {
-			Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
-			m.addAttribute("totalOrderPrice", totalOrderPrice);
-		}
-		return "/user/cart";
-	}
+        UserDtls user = getLoggedInUserDetails(p);
+        List<Cart> carts = cartService.getCartsByUser(user.getId());
+        m.addAttribute("carts", carts);
+        if (carts.size() > 0) {
+            Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
+            m.addAttribute("totalOrderPrice", totalOrderPrice);
+        }
+        return "/user/cart";
+    }
 
-	@GetMapping("/cartQuantityUpdate")
-	public String updateCartQuantity(@RequestParam String sy, @RequestParam Integer cid) {
-		cartService.updateQuantity(sy, cid);
-		return "redirect:/user/cart";
-	}
+    @GetMapping("/cartQuantityUpdate")
+    public String updateCartQuantity(@RequestParam String sy, @RequestParam Integer cid) {
+        cartService.updateQuantity(sy, cid);
+        return "redirect:/user/cart";
+    }
 
-	private UserDtls getLoggedInUserDetails(Principal p) {
-		String email = p.getName();
-		UserDtls userDtls = userService.getUserByEmail(email);
-		return userDtls;
-	}
+    private UserDtls getLoggedInUserDetails(Principal p) {
+        String email = p.getName();
+        UserDtls userDtls = userService.getUserByEmail(email);
+        return userDtls;
+    }
 
-	@GetMapping("/orders")
-	public String orderPage(Principal p, Model m) {
-		UserDtls user = getLoggedInUserDetails(p);
-		List<Cart> carts = cartService.getCartsByUser(user.getId());
-		m.addAttribute("carts", carts);
-		if (carts.size() > 0) {
-			Double orderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
-			Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice() + 250 + 100;
-			m.addAttribute("orderPrice", orderPrice);
-			m.addAttribute("totalOrderPrice", totalOrderPrice);
-		}
-		return "/user/order";
-	}
+    @GetMapping("/orders")
+    public String orderPage(Principal p, Model m) {
+        UserDtls user = getLoggedInUserDetails(p);
+        List<Cart> carts = cartService.getCartsByUser(user.getId());
+        UserDtls userDtls = userService.getUserByEmail(user.getEmail());
+        m.addAttribute("carts", carts);
+        m.addAttribute("userDtls", userDtls);
+        if (carts.size() > 0) {
+            Double orderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
+            Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice() + 250 + 100;
+            m.addAttribute("orderPrice", orderPrice);
+            m.addAttribute("totalOrderPrice", totalOrderPrice);
+        }
+        return "/user/order";
+    }
 
-	@PostMapping("/save-order")
-	public String saveOrder(@ModelAttribute OrderRequest request, Principal p) throws Exception {
-		// System.out.println(request);
-		UserDtls user = getLoggedInUserDetails(p);
-		orderService.saveOrder(user.getId(), request);
-		return "redirect:/user/success";
-	}
+    @PostMapping("/save-order")
+    public String saveOrder(@ModelAttribute OrderRequest request, Principal p) throws Exception {
+        // System.out.println(request);
+        UserDtls user = getLoggedInUserDetails(p);
+        orderService.saveOrder(user.getId(), request);
+        return "redirect:/user/success";
+    }
 
-	@GetMapping("/success")
-	public String loadSuccess() {
-		return "/user/success";
-	}
+    @GetMapping("/success")
+    public String loadSuccess() {
+        return "/user/success";
+    }
 
-	@GetMapping("/user-orders")
-	public String myOrder(Model m, Principal p) {
-		UserDtls loginUser = getLoggedInUserDetails(p);
-		List<ProductOrder> orders = orderService.getOrdersByUser(loginUser.getId());
-		m.addAttribute("orders", orders);
-		return "/user/my_orders";
-	}
+    @GetMapping("/user-orders")
+    public String myOrder(Model m, Principal p) {
+        UserDtls loginUser = getLoggedInUserDetails(p);
+        List<ProductOrder> orders = orderService.getOrdersByUser(loginUser.getId());
+        m.addAttribute("orders", orders);
+        return "/user/my_orders";
+    }
 
-	@GetMapping("/update-status")
-	public String updateOrderStatus(@RequestParam Integer id, @RequestParam Integer st, HttpSession session) {
+    @GetMapping("/update-status")
+    public String updateOrderStatus(@RequestParam Integer id, @RequestParam Integer st, HttpSession session) {
 
-		OrderStatus[] values = OrderStatus.values();
-		String status = null;
+        OrderStatus[] values = OrderStatus.values();
+        String status = null;
 
-		for (OrderStatus orderSt : values) {
-			if (orderSt.getId().equals(st)) {
-				status = orderSt.getName();
-			}
-		}
+        for (OrderStatus orderSt : values) {
+            if (orderSt.getId().equals(st)) {
+                status = orderSt.getName();
+            }
+        }
 
-		ProductOrder updateOrder = orderService.updateOrderStatus(id, status);
-		
-		try {
-			commonUtil.sendMailForUpdate(updateOrder, status);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        ProductOrder updateOrder = orderService.updateOrderStatus(id, status);
 
-		if (!ObjectUtils.isEmpty(updateOrder)) {
-			session.setAttribute("succMsg", "Status Updated");
-		} else {
-			session.setAttribute("errorMsg", "status not updated");
-		}
-		return "redirect:/user/user-orders";
-	}
+        try {
+            commonUtil.sendMailForUpdate(updateOrder, status);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	@GetMapping("/profile")
-	public String profile() {
-		return "/user/profile";
-	}
+        if (!ObjectUtils.isEmpty(updateOrder)) {
+            session.setAttribute("succMsg", "Status Updated");
+        } else {
+            session.setAttribute("errorMsg", "status not updated");
+        }
+        return "redirect:/user/user-orders";
+    }
 
-	@PostMapping("/update-profile")
-	public String updateProfile(@ModelAttribute UserDtls user, @RequestParam MultipartFile img, HttpSession session) {
-		UserDtls updateUserProfile = userService.updateUserProfile(user, img);
-		if (ObjectUtils.isEmpty(updateUserProfile)) {
-			session.setAttribute("errorMsg", "Profile not updated");
-		} else {
-			session.setAttribute("succMsg", "Profile Updated");
-		}
-		return "redirect:/user/profile";
-	}
+    @GetMapping("/profile")
+    public String profile() {
+        return "/user/profile";
+    }
 
-	@PostMapping("/change-password")
-	public String changePassword(@RequestParam String newPassword, @RequestParam String currentPassword, Principal p,
-			HttpSession session) {
-		UserDtls loggedInUserDetails = getLoggedInUserDetails(p);
+    @PostMapping("/update-profile")
+    public String updateProfile(@ModelAttribute UserDtls user, @RequestParam MultipartFile img, HttpSession session) {
+        UserDtls updateUserProfile = userService.updateUserProfile(user, img);
+        if (ObjectUtils.isEmpty(updateUserProfile)) {
+            session.setAttribute("errorMsg", "Profile not updated");
+        } else {
+            session.setAttribute("succMsg", "Profile Updated");
+        }
+        return "redirect:/user/profile";
+    }
 
-		boolean matches = passwordEncoder.matches(currentPassword, loggedInUserDetails.getPassword());
+    @PostMapping("/change-password")
+    public String changePassword(@RequestParam String newPassword, @RequestParam String currentPassword, Principal p,
+                                 HttpSession session) {
+        UserDtls loggedInUserDetails = getLoggedInUserDetails(p);
 
-		if (matches) {
-			String encodePassword = passwordEncoder.encode(newPassword);
-			loggedInUserDetails.setPassword(encodePassword);
-			UserDtls updateUser = userService.updateUser(loggedInUserDetails);
-			if (ObjectUtils.isEmpty(updateUser)) {
-				session.setAttribute("errorMsg", "Password not updated !! Error in server");
-			} else {
-				session.setAttribute("succMsg", "Password Updated sucessfully");
-			}
-		} else {
-			session.setAttribute("errorMsg", "Current Password incorrect");
-		}
+        boolean matches = passwordEncoder.matches(currentPassword, loggedInUserDetails.getPassword());
 
-		return "redirect:/user/profile";
-	}
-	@GetMapping("/cartDeleteProduct")
-	public String cartDeleteProduct(@RequestParam Integer cid) {
-		cartService.deleteCart(cid);
-		return "redirect:/user/cart";
-	}
+        if (matches) {
+            String encodePassword = passwordEncoder.encode(newPassword);
+            loggedInUserDetails.setPassword(encodePassword);
+            UserDtls updateUser = userService.updateUser(loggedInUserDetails);
+            if (ObjectUtils.isEmpty(updateUser)) {
+                session.setAttribute("errorMsg", "Password not updated !! Error in server");
+            } else {
+                session.setAttribute("succMsg", "Password Updated sucessfully");
+            }
+        } else {
+            session.setAttribute("errorMsg", "Current Password incorrect");
+        }
+
+        return "redirect:/user/profile";
+    }
+
+    @GetMapping("/cartDeleteProduct")
+    public String cartDeleteProduct(@RequestParam Integer cid) {
+        cartService.deleteCart(cid);
+        return "redirect:/user/cart";
+    }
 
 }

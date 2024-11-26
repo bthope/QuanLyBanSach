@@ -549,6 +549,8 @@ public class AdminController {
         UserDtls user = getLoggedInUserDetails(p);
         List<Cart> carts = cartService.getCartsByUser(user.getId());
         m.addAttribute("carts", carts);
+        UserDtls userDtls = userService.getUserByEmail(user.getEmail());
+        m.addAttribute("userDtls", userDtls);
         if (carts.size() > 0) {
             Double orderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
             Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice() + 250 + 100;
