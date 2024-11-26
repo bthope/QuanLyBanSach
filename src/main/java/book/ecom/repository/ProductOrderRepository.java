@@ -8,8 +8,8 @@ import book.ecom.model.ProductOrder;
 
 public interface ProductOrderRepository extends JpaRepository<ProductOrder, Integer> {
 
-	List<ProductOrder> findByUserId(Integer userId);
+    List<ProductOrder> findByUserIdOrderByOrderDateDesc(Integer userId);
 
-	ProductOrder findByOrderId(String orderId);
+    ProductOrder findByOrderId(String orderId);
 
 }

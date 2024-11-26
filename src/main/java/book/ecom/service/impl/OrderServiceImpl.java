@@ -1,9 +1,8 @@
 package book.ecom.service.impl;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,13 +36,13 @@ public class OrderServiceImpl implements OrderService {
     public void saveOrder(Integer userid, OrderRequest orderRequest) throws Exception {
 
         List<Cart> carts = cartRepository.findByUserId(userid);
-
+        List<ProductOrder> orders = new ArrayList<ProductOrder>();
         for (Cart cart : carts) {
 
             ProductOrder order = new ProductOrder();
 
             order.setOrderId(UUID.randomUUID().toString());
-            order.setOrderDate(LocalDate.now());
+            order.setOrderDate(LocalDateTime.now());
 
             order.setProduct(cart.getProduct());
             order.setPrice(cart.getProduct().getDiscountPrice());
@@ -66,14 +65,16 @@ public class OrderServiceImpl implements OrderService {
 
             order.setOrderAddress(address);
 
-            ProductOrder saveOrder = orderRepository.save(order);
-            commonUtil.sendMailForProductOrder(saveOrder, "success");
+            orders.add(order);
         }
+        List<ProductOrder> saveOrder = orderRepository.saveAll(orders);
+        cartRepository.deleteAll(carts);
+        commonUtil.sendMailForProductOrder(saveOrder, "success");
     }
 
     @Override
     public List<ProductOrder> getOrdersByUser(Integer userId) {
-        List<ProductOrder> orders = orderRepository.findByUserId(userId);
+        List<ProductOrder> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);
         return orders;
     }
 

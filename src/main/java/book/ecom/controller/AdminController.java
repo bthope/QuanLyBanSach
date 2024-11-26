@@ -390,7 +390,7 @@ public class AdminController {
         ProductOrder updateOrder = orderService.updateOrderStatus(id, status);
 
         try {
-            commonUtil.sendMailForProductOrder(updateOrder, status);
+            commonUtil.sendMailForUpdate(updateOrder, status);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -592,10 +592,10 @@ public class AdminController {
             }
         }
 
-        ProductOrder updateOrder = orderService.updateOrderStatusAdmin(id, status);
+        ProductOrder updateOrder = orderService.updateOrderStatus(id, status);
 
         try {
-            commonUtil.sendMailForProductOrder(updateOrder, status);
+            commonUtil.sendMailForUpdate(updateOrder, status);
         } catch (Exception e) {
             e.printStackTrace();
         }

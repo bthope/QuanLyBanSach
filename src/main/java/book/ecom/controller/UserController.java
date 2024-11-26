@@ -125,7 +125,6 @@ public class UserController {
 		// System.out.println(request);
 		UserDtls user = getLoggedInUserDetails(p);
 		orderService.saveOrder(user.getId(), request);
-
 		return "redirect:/user/success";
 	}
 
@@ -157,7 +156,7 @@ public class UserController {
 		ProductOrder updateOrder = orderService.updateOrderStatus(id, status);
 		
 		try {
-			commonUtil.sendMailForProductOrder(updateOrder, status);
+			commonUtil.sendMailForUpdate(updateOrder, status);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
