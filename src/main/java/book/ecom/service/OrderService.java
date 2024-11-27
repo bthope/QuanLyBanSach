@@ -1,5 +1,7 @@
 package book.ecom.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -25,4 +27,13 @@ public interface OrderService {
     public Page<ProductOrder> getAllOrdersPagination(Integer pageNo, Integer pageSize);
 
     public List<Object[]> getMonthlySalesByYear(int year);
+
+    //Thống kê theo ngày
+    public List<Object[]> getDailySalesByMonth(int year, int month);
+
+    //TK KH
+    List<Object[]> getTopCustomersByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+
+    //TK SP
+    List<Object[]> getTopProductsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
 }

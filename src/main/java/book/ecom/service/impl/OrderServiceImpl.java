@@ -2,6 +2,7 @@ package book.ecom.service.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -138,6 +139,35 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return result;
+    }
+
+    @Override
+    public List<Object[]> getDailySalesByMonth(int year, int month) {
+        List<Object[]> rawData = orderRepository.getPriceByDay(year, month);
+        List<Object[]> result = new ArrayList<>();
+
+        // Initialize all days with 0
+        int daysInMonth = YearMonth.of(year, month).lengthOfMonth();
+        IntStream.rangeClosed(1, daysInMonth).forEach(day -> result.add(new Object[]{day, 0}));
+
+        // Fill in the actual data
+        for (Object[] data : rawData) {
+            int day = (int) data[0];
+            double totalPrice = (double) data[1];
+            result.set(day - 1, new Object[]{day, totalPrice});
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<Object[]> getTopCustomersByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        return orderRepository.findTopCustomersByDateRange(startDate, endDate);
+    }
+
+    @Override
+    public List<Object[]> getTopProductsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        return orderRepository.findTopProductsByDateRange(startDate, endDate);
     }
 
     @Override

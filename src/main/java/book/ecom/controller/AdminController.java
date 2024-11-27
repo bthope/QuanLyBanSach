@@ -7,6 +7,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 import book.ecom.model.*;
@@ -639,13 +642,20 @@ public class AdminController {
         cartService.deleteCart(cid);
         return "redirect:/admin/cart";
     }
+
     @GetMapping("/statistics")
     public String showStatistics(Model model) {
         // Add necessary attributes to the model
         return "admin/statistics"; // Ensure this matches the view name
     }
 
-    @GetMapping("/statistics/{year}")
+    @GetMapping("/statistics_year")
+    public String showStatisticsYear(Model model) {
+        // Add necessary attributes to the model
+        return "admin/statistics_year";
+    }
+
+    @GetMapping("/statistics_year/{year}")
     @ResponseBody
     public Map<String, Object> showStatistics(@PathVariable int year) {
         List<Object[]> salesData = orderService.getMonthlySalesByYear(year);
@@ -664,6 +674,56 @@ public class AdminController {
         response.put("prices", prices);
 
         return response;
+    }
+
+    //TK theo Day
+    @GetMapping("/statistics_month")
+    public String showStatisticsMonth(Model model) {
+        // Add necessary attributes to the model
+        return "admin/statistics_month"; // Ensure this matches the view name
+    }
+
+    @GetMapping("/statistics_month/{year}/{month}")
+    @ResponseBody
+    public Map<String, Object> getMonthlyStatistics(@PathVariable int year, @PathVariable int month) {
+        List<Object[]> salesData = orderService.getDailySalesByMonth(year, month);
+        Map<String, Object> response = new HashMap<>();
+        response.put("days", salesData.stream().map(data -> data[0]).toArray());
+        response.put("prices", salesData.stream().map(data -> data[1]).toArray());
+        return response;
+    }
+
+    //TK by KH
+    @GetMapping("/statistics_customer")
+    public String showStatisticsCustomer(Model model) {
+        // Add necessary attributes to the model
+        return "admin/statistics_customer"; // Ensure this matches the view name
+    }
+
+    @GetMapping("/top_customers")
+    @ResponseBody
+    public List<Object[]> getTopCustomers(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+        LocalDateTime startDateTime = start.atStartOfDay();
+        LocalDateTime endDateTime = end.atTime(LocalTime.MAX);
+        return orderService.getTopCustomersByDateRange(startDateTime, endDateTime);
+    }
+
+    //TK by SP
+    @GetMapping("/statistics_product")
+    public String showStatisticsProduct(Model model) {
+        // Add necessary attributes to the model
+        return "admin/statistics_product"; // Ensure this matches the view name
+    }
+    @GetMapping("/top_products")
+    @ResponseBody
+    public List<Object[]> getTopProducts(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+        LocalDateTime startDateTime = start.atStartOfDay();
+        LocalDateTime endDateTime = end.atTime(LocalTime.MAX);
+        return orderService.getTopProductsByDateRange(startDateTime, endDateTime);
     }
 
 }
