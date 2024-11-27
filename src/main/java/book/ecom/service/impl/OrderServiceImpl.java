@@ -3,6 +3,7 @@ package book.ecom.service.impl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.IntStream;
 
 import book.ecom.model.*;
 import book.ecom.repository.ProductRepository;
@@ -119,6 +120,24 @@ public class OrderServiceImpl implements OrderService {
     public Page<ProductOrder> getAllOrdersPagination(Integer pageNo, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("orderDate").descending());
         return orderRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Object[]> getMonthlySalesByYear(int year) {
+        List<Object[]> rawData = orderRepository.getPriceByMonth(year);
+        List<Object[]> result = new ArrayList<>();
+
+        // Initialize all months with 0
+        IntStream.rangeClosed(1, 12).forEach(month -> result.add(new Object[]{month, 0}));
+
+        // Fill in the actual data
+        for (Object[] data : rawData) {
+            int month = (int) data[0];
+            double totalPrice = (double) data[1];
+            result.set(month - 1, new Object[]{month, totalPrice});
+        }
+
+        return result;
     }
 
     @Override

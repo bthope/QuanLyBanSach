@@ -7,9 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import book.ecom.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import book.ecom.service.CartService;
@@ -645,6 +638,32 @@ public class AdminController {
     public String cartDeleteProduct(@RequestParam Integer cid) {
         cartService.deleteCart(cid);
         return "redirect:/admin/cart";
+    }
+    @GetMapping("/statistics")
+    public String showStatistics(Model model) {
+        // Add necessary attributes to the model
+        return "admin/statistics"; // Ensure this matches the view name
+    }
+
+    @GetMapping("/statistics/{year}")
+    @ResponseBody
+    public Map<String, Object> showStatistics(@PathVariable int year) {
+        List<Object[]> salesData = orderService.getMonthlySalesByYear(year);
+        String[] months = {"January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"};
+        int[] prices = new int[12];
+
+        for (Object[] data : salesData) {
+            int month = (int) data[0];
+            Number totalPrice = (Number) data[1];
+            prices[month - 1] = totalPrice.intValue();
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("months", months);
+        response.put("prices", prices);
+
+        return response;
     }
 
 }
