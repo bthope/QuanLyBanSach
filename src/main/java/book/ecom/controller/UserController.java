@@ -100,8 +100,8 @@ public class UserController {
         }
 
         m.addAttribute("carts", carts);
-        if (carts.size() > 0) {
-            Double totalOrderPrice = carts.stream().mapToDouble(Cart::getTotalOrderPrice).sum();
+        if (!carts.isEmpty()) {
+            Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
             m.addAttribute("totalOrderPrice", totalOrderPrice);
         }
         return "/user/cart";

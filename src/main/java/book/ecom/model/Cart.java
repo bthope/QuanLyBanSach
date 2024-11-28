@@ -13,22 +13,22 @@ import lombok.Setter;
 @Setter
 public class Cart {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	@ManyToOne
-	private UserDtls user;
+    @ManyToOne
+    private UserDtls user;
 
-	@ManyToOne
-	private Product product;
+    @ManyToOne
+    private Product product;
 
-	private Integer quantity;
-	
-	@Transient
-	private Double totalPrice;
-	
-	@Transient
-	private Double totalOrderPrice;
+    private Integer quantity;
+
+    @Transient
+    private Double totalPrice;
+
+    @Transient
+    private Double totalOrderPrice;
 
 }

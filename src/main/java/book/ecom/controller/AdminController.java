@@ -542,8 +542,8 @@ public class AdminController {
         }
 
         m.addAttribute("carts", carts);
-        if (carts.size() > 0) {
-            Double totalOrderPrice = carts.stream().mapToDouble(Cart::getTotalOrderPrice).sum();
+        if (!carts.isEmpty()) {
+            Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
             m.addAttribute("totalOrderPrice", totalOrderPrice);
         }
         return "/admin/cart";
@@ -716,6 +716,7 @@ public class AdminController {
         // Add necessary attributes to the model
         return "admin/statistics_product"; // Ensure this matches the view name
     }
+
     @GetMapping("/top_products")
     @ResponseBody
     public List<Object[]> getTopProducts(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
