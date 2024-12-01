@@ -42,9 +42,12 @@
 								<div class="row">
 									<div class="mb-3 col">
 										<label>Category</label> <select class="form-control"
-											name="category">
-											<option>[[${product.category}]]</option>
-											<option th:each="c:${categories}">[[${c.name}]]</option>
+											name="categoryId">
+											<option th:value="${product.category.id}">[[${product.category.name}]]</option>
+											<option th:each="category : ${categories}"
+													th:value="${category.id}"
+													th:text="${category.name}">
+											</option>
 										</select>
 									</div>
 									<div class="mb-3 col">
@@ -95,8 +98,15 @@
 									</div>
 
 									<div class="mt-1">
-										<img th:src="@{'/img/product_img/'+${product.image}}"
-											width="100px" height="100px">
+										<img th:if="${product.image != null}"
+											 th:src="${product.isImageUrl()} ? ${product.image} : @{'/img/product_img/' + ${product.image}}"
+											 width="100px"
+											 height="100px">
+										<img th:unless="${product.image != null}"
+											 th:src="@{/img/product_img/default-product.jpg}"
+											 alt="Default product image"
+											 width="100px"
+											 height="100px">
 									</div>
 
 								</div>

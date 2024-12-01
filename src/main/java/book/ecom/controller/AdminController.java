@@ -321,8 +321,9 @@ public class AdminController {
 
     @PostMapping("/updateProduct")
     public String updateProduct(@ModelAttribute Product product, @RequestParam("file") MultipartFile image,
-                                HttpSession session, Model m) {
-
+                                HttpSession session, Model m, @RequestParam("categoryId") int categoryId) {
+        Category category = categoryService.getCategoryById(categoryId);
+        product.setCategory(category);
         if (product.getDiscount() < 0 || product.getDiscount() > 100) {
             session.setAttribute("errorMsg", "invalid Discount");
         } else {
